@@ -1,0 +1,5 @@
+url: "https://www.youtube.com/watch?v=dinyOvO2EEo"
+
+yt_dlp:
+  format: "bestvideo+bestaudio/best"
+  merge_output_format: "mp4"

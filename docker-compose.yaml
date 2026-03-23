@@ -1,0 +1,6 @@
+services:
+  groove:
+    build: .
+    volumes:
+      - ./downloads:/downloads
+      - ./config.yaml:/app/config.yaml:ro
