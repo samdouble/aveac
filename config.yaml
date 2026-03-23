@@ -1,5 +1,4 @@
-url: "https://www.youtube.com/watch?v=dinyOvO2EEo"
-
-yt_dlp:
-  format: "bestvideo+bestaudio/best"
-  merge_output_format: "mp4"
+operations:
+  - type: "download"
+    name: "Hell's Kitchen Sound"
+    url: "https://www.youtube.com/watch?v=dinyOvO2EEo"
