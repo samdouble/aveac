@@ -10,6 +10,7 @@ from groove.operations.convert import ConvertOperation
 from groove.operations.cut import CutOperation
 from groove.operations.download import DownloadOperation
 from groove.operations.extract_voice import ExtractVoiceOperation
+from groove.operations.suno_extend import SunoExtendOperation
 
 CONFIG_PATH = "/app/config.yaml"
 
@@ -18,6 +19,7 @@ Operation = Annotated[
     | CutOperation
     | DownloadOperation
     | ExtractVoiceOperation
+    | SunoExtendOperation,
     Field(discriminator="type"),
 ]
 
