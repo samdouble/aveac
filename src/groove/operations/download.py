@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Literal
 from uuid import uuid4
 
@@ -10,6 +11,7 @@ class DownloadOperation(BaseModel):
     url: HttpUrl
     name: str | None = None
     id: str = Field(default_factory=lambda: str(uuid4()))
+    output: str | None = None
 
     @field_validator("url")
     @classmethod
@@ -19,16 +21,16 @@ class DownloadOperation(BaseModel):
             raise ValueError(f"URL must be a YouTube link, got: {v}")
         return v
 
-    def run(self) -> None:
+    def run(self, output_dir: Path) -> Path:
         label = self.name or str(self.url)
         print(f"[{self.id}] Starting download: {label}")
         ydl_opts = {
             "format": "bestvideo+bestaudio/best",
             "merge_output_format": "mp4",
-            "outtmpl": "/downloads/%(title)s.%(ext)s",
+            "outtmpl": str(output_dir / "%(title)s.%(ext)s"),
         }
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(str(self.url), download=False)
-            print(f"[{self.id}] Downloading: {info['title']}")
-            ydl.download([str(self.url)])
+            info = ydl.extract_info(str(self.url), download=True)
+            output_path = Path(info["requested_downloads"][0]["filepath"])
         print(f"[{self.id}] Done.")
+        return output_path

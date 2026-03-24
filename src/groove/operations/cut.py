@@ -24,6 +24,7 @@ class CutOperation(BaseModel):
     end: Annotated[str, Field(description="End timestamp (HH:MM:SS, MM:SS, or seconds)")]
     name: str | None = None
     id: str = Field(default_factory=lambda: str(uuid4()))
+    output: str | None = None
 
     @field_validator("start", "end")
     @classmethod
@@ -42,7 +43,7 @@ class CutOperation(BaseModel):
             raise ValueError(f"end ({self.end}) must be after start ({self.start})")
         return self
 
-    def run(self) -> None:
+    def run(self, output_dir: Path) -> Path:
         input_path = Path(self.input)
         if not input_path.exists():
             raise FileNotFoundError(f"Input file not found: {input_path}")
@@ -51,7 +52,7 @@ class CutOperation(BaseModel):
         end_s = _parse_timestamp(self.end)
         duration = end_s - start_s
 
-        output_path = input_path.with_stem(f"{input_path.stem}_cut")
+        output_path = output_dir / f"{input_path.stem}_cut{input_path.suffix}"
         label = self.name or input_path.name
         print(f"[{self.id}] Cutting: {label} [{self.start} → {self.end}]")
         (
@@ -61,3 +62,4 @@ class CutOperation(BaseModel):
             .run()
         )
         print(f"[{self.id}] Done → {output_path.name}")
+        return output_path

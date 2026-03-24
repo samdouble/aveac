@@ -1,4 +1,7 @@
+import shutil
+from pathlib import Path
 from typing import Annotated
+from uuid import uuid4
 
 import yaml
 from pydantic import BaseModel, Field
@@ -16,11 +19,13 @@ Operation = Annotated[
 
 
 class Step(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid4()))
     name: str | None = None
     operations: list[Operation]
 
 
 class Config(BaseModel):
+    output_dir: Path = Path("/output")
     steps: list[Step]
 
 
@@ -36,7 +41,16 @@ def main() -> None:
         if step.name:
             print(f"\n── Step: {step.name} ──")
         for op in step.operations:
-            op.run()
+            output_dir = Path(f"tmp/steps.{step.id}/operations.{op.id}")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            result = op.run(output_dir=output_dir)
+            if op.output is not None:
+                dest = Path(op.output)
+                if not dest.is_absolute():
+                    dest = config.output_dir / dest
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(result, dest)
+                print(f"  → copied to {dest}")
 
 
 if __name__ == "__main__":

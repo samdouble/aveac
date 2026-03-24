@@ -2,5 +2,5 @@ services:
   groove:
     build: .
     volumes:
-      - ./downloads:/downloads
+      - ./output:/output
       - ./config.yaml:/app/config.yaml:ro

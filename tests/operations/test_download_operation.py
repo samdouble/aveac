@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from pydantic import ValidationError
 from pytest_mock import MockerFixture
@@ -45,32 +47,44 @@ class TestDownloadOperationValidation:
         op = make_op(name="My Video")
         assert op.name == "My Video"
 
+    def test_output_defaults_to_none(self) -> None:
+        op = make_op()
+        assert op.output is None
+
 
 class TestDownloadOperationRun:
-    def test_run_calls_yt_dlp_with_correct_url(self, mocker: MockerFixture) -> None:
+    def _mock_ydl(self, mocker: MockerFixture, tmp_path: Path) -> object:
+        downloaded_file = tmp_path / "video.mp4"
+        downloaded_file.touch()
         mock_ydl = mocker.MagicMock()
         mock_ydl.__enter__ = mocker.MagicMock(return_value=mock_ydl)
         mock_ydl.__exit__ = mocker.MagicMock(return_value=False)
-        mock_ydl.extract_info.return_value = {"title": "Test Video"}
+        mock_ydl.extract_info.return_value = {
+            "title": "Test Video",
+            "requested_downloads": [{"filepath": str(downloaded_file)}],
+        }
         mocker.patch("groove.operations.download.yt_dlp.YoutubeDL", return_value=mock_ydl)
+        return mock_ydl
 
+    def test_run_returns_downloaded_path(self, mocker: MockerFixture, tmp_path: Path) -> None:
+        self._mock_ydl(mocker, tmp_path)
         op = make_op()
-        op.run()
+        result = op.run(output_dir=tmp_path)
+        assert result == tmp_path / "video.mp4"
 
-        mock_ydl.extract_info.assert_called_once_with(str(op.url), download=False)
-        mock_ydl.download.assert_called_once_with([str(op.url)])
+    def test_run_calls_extract_info_with_download(
+        self, mocker: MockerFixture, tmp_path: Path
+    ) -> None:
+        mock_ydl = self._mock_ydl(mocker, tmp_path)
+        op = make_op()
+        op.run(output_dir=tmp_path)
+        mock_ydl.extract_info.assert_called_once_with(str(op.url), download=True)
 
     def test_run_uses_name_as_label_when_set(
-        self, mocker: MockerFixture, capsys: pytest.CaptureFixture[str]
+        self, mocker: MockerFixture, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        mock_ydl = mocker.MagicMock()
-        mock_ydl.__enter__ = mocker.MagicMock(return_value=mock_ydl)
-        mock_ydl.__exit__ = mocker.MagicMock(return_value=False)
-        mock_ydl.extract_info.return_value = {"title": "Test Video"}
-        mocker.patch("groove.operations.download.yt_dlp.YoutubeDL", return_value=mock_ydl)
-
+        self._mock_ydl(mocker, tmp_path)
         op = make_op(name="My Song", id="test-id")
-        op.run()
-
+        op.run(output_dir=tmp_path)
         captured = capsys.readouterr()
         assert "My Song" in captured.out
