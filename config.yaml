@@ -1,14 +1,19 @@
-operations:
-  - type: "download"
-    name: "Hell's Kitchen Sound"
-    url: "https://www.youtube.com/watch?v=dinyOvO2EEo"
-  - type: "cut"
-    name: "Hell's Kitchen Sound"
-    input: "/downloads/Hell's Kitchen Dramatic Sound (Waterphone) - Sound Effect (HD).mp4"
-    start: "00:00:02"
-    end: "00:00:05"
-  - type: "convert"
-    name: "Hell's Kitchen Sound"
-    input: "/downloads/Hell's Kitchen Dramatic Sound (Waterphone) - Sound Effect (HD).mp4"
-    output_format: "mp3"
-    audio_bitrate: "192k"
+steps:
+  - name: "Download"
+    operations:
+      - type: "download"
+        name: "Hell's Kitchen Sound"
+        url: "https://www.youtube.com/watch?v=dinyOvO2EEo"
+
+  - name: "Process"
+    operations:
+      - type: "cut"
+        name: "Hell's Kitchen Sound"
+        input: "/downloads/Hell's Kitchen Dramatic Sound (Waterphone) - Sound Effect (HD).mp4"
+        start: "00:00:02"
+        end: "00:00:05"
+      - type: "convert"
+        name: "Hell's Kitchen Sound"
+        input: "/downloads/Hell's Kitchen Dramatic Sound (Waterphone) - Sound Effect (HD).mp4"
+        output_format: "mp3"
+        audio_bitrate: "192k"

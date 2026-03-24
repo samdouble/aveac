@@ -15,8 +15,13 @@ Operation = Annotated[
 ]
 
 
-class Config(BaseModel):
+class Step(BaseModel):
+    name: str | None = None
     operations: list[Operation]
+
+
+class Config(BaseModel):
+    steps: list[Step]
 
 
 def load_config(path: str) -> Config:
@@ -27,8 +32,11 @@ def load_config(path: str) -> Config:
 
 def main() -> None:
     config = load_config(CONFIG_PATH)
-    for op in config.operations:
-        op.run()
+    for step in config.steps:
+        if step.name:
+            print(f"\n── Step: {step.name} ──")
+        for op in step.operations:
+            op.run()
 
 
 if __name__ == "__main__":
