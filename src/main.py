@@ -4,12 +4,13 @@ import yaml
 from pydantic import BaseModel, Field
 
 from groove.operations.convert import ConvertOperation
+from groove.operations.cut import CutOperation
 from groove.operations.download import DownloadOperation
 
 CONFIG_PATH = "/app/config.yaml"
 
 Operation = Annotated[
-    ConvertOperation | DownloadOperation,
+    ConvertOperation | CutOperation | DownloadOperation,
     Field(discriminator="type"),
 ]
 
@@ -24,7 +25,7 @@ def load_config(path: str) -> Config:
     return Config.model_validate(raw)
 
 
-def main():
+def main() -> None:
     config = load_config(CONFIG_PATH)
     for op in config.operations:
         op.run()

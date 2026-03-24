@@ -26,7 +26,7 @@ jobs:
       - name: Format
         run: uv run ruff format .
       - name: Type check
-        run: uv run mypy app
+        run: uv run mypy src/
       - name: Export requirements for audit
         run: uv export --no-hashes --format requirements-txt -o requirements.txt
       - name: Audit
