@@ -9,11 +9,15 @@ from pydantic import BaseModel, Field
 from groove.operations.convert import ConvertOperation
 from groove.operations.cut import CutOperation
 from groove.operations.download import DownloadOperation
+from groove.operations.extract_voice import ExtractVoiceOperation
 
 CONFIG_PATH = "/app/config.yaml"
 
 Operation = Annotated[
-    ConvertOperation | CutOperation | DownloadOperation,
+    ConvertOperation
+    | CutOperation
+    | DownloadOperation
+    | ExtractVoiceOperation
     Field(discriminator="type"),
 ]
 
