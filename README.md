@@ -1,5 +1,5 @@
 # Groove on a Real Train
 
 ```sh
-docker compose up
+docker compose up --build
 ```

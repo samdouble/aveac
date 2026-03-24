@@ -1,14 +1,15 @@
-from typing import Annotated, Union
+from typing import Annotated
 
 import yaml
 from pydantic import BaseModel, Field
 
-from groove.operations.download import DownloadOperation, run_download
+from groove.operations.convert import ConvertOperation
+from groove.operations.download import DownloadOperation
 
 CONFIG_PATH = "/app/config.yaml"
 
 Operation = Annotated[
-    Union[DownloadOperation],
+    ConvertOperation | DownloadOperation,
     Field(discriminator="type"),
 ]
 
@@ -26,8 +27,7 @@ def load_config(path: str) -> Config:
 def main():
     config = load_config(CONFIG_PATH)
     for op in config.operations:
-        if isinstance(op, DownloadOperation):
-            run_download(op)
+        op.run()
 
 
 if __name__ == "__main__":

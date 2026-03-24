@@ -19,17 +19,16 @@ class DownloadOperation(BaseModel):
             raise ValueError(f"URL must be a YouTube link, got: {v}")
         return v
 
-
-def run_download(op: DownloadOperation) -> None:
-    label = op.name or str(op.url)
-    print(f"[{op.id}] Starting download: {label}")
-    ydl_opts = {
-        "format": "bestvideo+bestaudio/best",
-        "merge_output_format": "mp4",
-        "outtmpl": "/downloads/%(title)s.%(ext)s",
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(str(op.url), download=False)
-        print(f"[{op.id}] Downloading: {info['title']}")
-        ydl.download([str(op.url)])
-    print(f"[{op.id}] Done.")
+    def run(self) -> None:
+        label = self.name or str(self.url)
+        print(f"[{self.id}] Starting download: {label}")
+        ydl_opts = {
+            "format": "bestvideo+bestaudio/best",
+            "merge_output_format": "mp4",
+            "outtmpl": "/downloads/%(title)s.%(ext)s",
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(str(self.url), download=False)
+            print(f"[{self.id}] Downloading: {info['title']}")
+            ydl.download([str(self.url)])
+        print(f"[{self.id}] Done.")

@@ -2,3 +2,8 @@ operations:
   - type: "download"
     name: "Hell's Kitchen Sound"
     url: "https://www.youtube.com/watch?v=dinyOvO2EEo"
+  - type: "convert"
+    name: "Hell's Kitchen Sound"
+    input: "/downloads/Hell's Kitchen Dramatic Sound (Waterphone) - Sound Effect (HD).mp4"
+    output_format: "mp3"
+    audio_bitrate: "192k"
