@@ -4,6 +4,7 @@ version = "0.1.0"
 requires-python = ">=3.12"
 dependencies = [
     "ffmpeg-python>=0.2.0",
+    "httpx>=0.28.1",
     "librosa>=0.11.0",
     "pydantic>=2.12.5",
     "pyyaml>=6.0.3",
