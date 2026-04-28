@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 from groove.ffmpeg_command_builder import FFmpegCommandBuilder
 from groove.ffmpeg_runtime import FFmpegInvocation
+from groove.operations.input_ref import OperationInput
 
 
 def _escape_filter_path(p: Path) -> str:
@@ -46,7 +47,7 @@ class AddTextOperation(BaseModel):
     """Overlays a line of text for a time range using FFmpeg drawtext."""
 
     type: Literal["add_text"]
-    input: str
+    input: OperationInput
     text: str
     fontfile: str
     x: str
@@ -101,8 +102,25 @@ class AddTextOperation(BaseModel):
             raise ValueError(msg)
         return self
 
-    def build_invocation(self, output_dir: Path) -> FFmpegInvocation:
-        input_path = Path(self.input)
+    def resolve_input_path(self, results_by_id: dict[str, Path]) -> Path:
+        if isinstance(self.input, str):
+            return Path(self.input)
+        resolved_path = results_by_id.get(self.input.id)
+        if resolved_path is None:
+            raise ValueError(
+                f"Unknown operation id reference in add_text input: {self.input.id!r}"
+            )
+        return resolved_path
+
+    def build_invocation(
+        self, output_dir: Path, input_path: Path | None = None
+    ) -> FFmpegInvocation:
+        if input_path is None and isinstance(self.input, str):
+            input_path = Path(self.input)
+        if input_path is None:
+            raise ValueError(
+                "add_text input uses id reference but no resolved input_path was provided"
+            )
         if not input_path.exists():
             raise FileNotFoundError(f"Input file not found: {input_path}")
         font_path = Path(self.fontfile)

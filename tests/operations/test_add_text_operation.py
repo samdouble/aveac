@@ -100,6 +100,18 @@ class TestAddTextOperationBuildInvocation:
         with pytest.raises(FileNotFoundError, match="Input file not found"):
             op.build_invocation(tmp_path / "out")
 
+    def test_resolve_input_path_uses_operation_results(self, tmp_path: Path) -> None:
+        file_path = tmp_path / "resolved.mp4"
+        file_path.touch()
+        op = _make_op(tmp_path, input={"id": "intro"})
+        resolved = op.resolve_input_path(results_by_id={"intro": file_path})
+        assert resolved == file_path
+
+    def test_resolve_input_path_raises_on_unknown_id(self, tmp_path: Path) -> None:
+        op = _make_op(tmp_path, input={"id": "intro"})
+        with pytest.raises(ValueError, match="Unknown operation id reference"):
+            op.resolve_input_path(results_by_id={})
+
     def test_raises_when_font_missing(self, tmp_path: Path) -> None:
         v = tmp_path / "v.mp4"
         v.touch()

@@ -7,6 +7,7 @@ import yaml
 from pydantic import BaseModel, Field
 
 from groove.ffmpeg_runtime import run_ffmpeg
+from groove.operations.add_image import AddImageOperation
 from groove.operations.add_text import AddTextOperation
 from groove.operations.apply_filter import ApplyFilterOperation
 from groove.operations.concatenate import ConcatenateOperation
@@ -18,7 +19,8 @@ from groove.operations.extract_voice import ExtractVoiceOperation
 CONFIG_PATH = "/app/config.yaml"
 
 Operation = Annotated[
-    AddTextOperation
+    AddImageOperation
+    | AddTextOperation
     | ApplyFilterOperation
     | ConcatenateOperation
     | ConvertOperation
@@ -55,8 +57,11 @@ def main() -> None:
         for op in step.operations:
             output_dir = Path(f"tmp/steps.{step.id}/operations.{op.id}")
             output_dir.mkdir(parents=True, exist_ok=True)
-            if isinstance(op, AddTextOperation):
-                result = run_ffmpeg(op.build_invocation(output_dir=output_dir))
+            if isinstance(op, (AddImageOperation, AddTextOperation)):
+                resolved_input = op.resolve_input_path(results_by_id)
+                result = run_ffmpeg(
+                    op.build_invocation(output_dir=output_dir, input_path=resolved_input)
+                )
             elif isinstance(op, ConcatenateOperation):
                 resolved_inputs = op.resolve_input_paths(results_by_id)
                 result = run_ffmpeg(

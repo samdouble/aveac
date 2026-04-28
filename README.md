@@ -21,11 +21,26 @@ docker compose up --build
 
 #### Operations
 
+##### Add image
+
+```yaml
+- type: "add_image"
+  input: { id: "intro-cut" } # or "/output/somevideo.mp4"
+  image: "/app/src/assets/images/logo.png"
+  x: "(W-w)/2"
+  y: "80"
+  start: 1.0
+  end: 4.5
+  fade_in: 0.5
+  fade_out: 0.5
+  output: "somevideo-imaged.mp4"
+```
+
 ##### Add text
 
 ```yaml
 - type: "add_text"
-  input: "/output/somevideo.mp4"
+  input: { id: "intro-cut" } # or "/output/somevideo.mp4"
   text: "Hello"
   fontfile: "/app/src/assets/fonts/Michland Script.otf"
   x: "(w-text_w)/2"
@@ -45,7 +60,7 @@ docker compose up --build
 - type: "concatenate"
   inputs:
     - "/output/part1.mp4"
-    - { id: "intro-title-card" } # use a previous operation result by id
+    - { id: "intro-title-card" }
     - "/output/part3.mp4"
   mode: "reencode" # default; safer when stream parameters differ
   output: "merged.mp4"

@@ -2,6 +2,7 @@ steps:
   - name: "Download"
     operations:
       - type: "download"
+        id: "Fail"
         name: "Download TOR vs CAR Game Recap"
         #url: "https://www.youtube.com/shorts/29v8Da8mhF4" (9.05, 8500)
         url: "https://www.youtube.com/watch?v=tH1e93SJllE"
@@ -14,7 +15,7 @@ steps:
       - id: "Title card"
         name: "Title card"
         type: "add_text"
-        input: "/output/fail.mp4"
+        input: { id: "Fail" }
         text: "Hello"
         # Bundled font (COPY src/ in the image); use DejaVu instead: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
         fontfile: "/app/src/assets/fonts/Michland Script.otf"
@@ -27,9 +28,21 @@ steps:
         fontsize: 42
         fontcolor: "yellow"
         output: "fail-titled.mp4"
-      - type: "concatenate"
+      - id: "Concatenate"
+        type: "concatenate"
         name: "Concatenate"
         inputs:
           - "/output/sound.mp4"
           - { id: "Title card" }
         output: "fail-titled-concat.mp4"
+      - name: "Add logo"
+        type: "add_image"
+        input: { id: "Concatenate" }
+        image: "/app/src/assets/images/yul-metro.png"
+        x: "(W-w)/2"
+        y: "80"
+        start: 1.0
+        end: 4.5
+        fade_in: 0.5
+        fade_out: 0.5
+        output: "fail-titled-concat-logo.mp4"
