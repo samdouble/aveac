@@ -6,20 +6,22 @@ from uuid import uuid4
 import yaml
 from pydantic import BaseModel, Field
 
+from groove.operations.add_text import AddTextOperation
+from groove.operations.apply_filter import ApplyFilterOperation
 from groove.operations.convert import ConvertOperation
 from groove.operations.cut import CutOperation
 from groove.operations.download import DownloadOperation
 from groove.operations.extract_voice import ExtractVoiceOperation
-from groove.operations.suno_extend import SunoExtendOperation
 
 CONFIG_PATH = "/app/config.yaml"
 
 Operation = Annotated[
-    ConvertOperation
+    AddTextOperation
+    | ApplyFilterOperation
+    | ConvertOperation
     | CutOperation
     | DownloadOperation
-    | ExtractVoiceOperation
-    | SunoExtendOperation,
+    | ExtractVoiceOperation,
     Field(discriminator="type"),
 ]
 

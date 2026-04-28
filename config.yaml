@@ -3,23 +3,24 @@ steps:
     operations:
       - type: "download"
         name: "Download TOR vs CAR Game Recap"
-        url: "https://www.youtube.com/watch?v=I2qYdtshu8U"
-        output: "tor-vs-car-game-recap.mp4"
-
-  - name: "Get music segment from the video"
-    operations:
+        #url: "https://www.youtube.com/shorts/29v8Da8mhF4" (9.05, 8500)
+        url: "https://www.youtube.com/watch?v=tH1e93SJllE"
+        output: "fail.mp4"
       - type: "convert"
         name: "Hell's Kitchen Sound"
-        input: "/output/tor-vs-car-game-recap.mp4"
+        input: "/output/fail.mp4"
         output_format: "mp3"
-        output: "tor-vs-car-game-recap.mp3"
-      - type: "extract_voice"
-        name: "Extract voice from the video"
-        input: "/output/tor-vs-car-game-recap.mp3"
-        target: "vocals"
-        output: "tor-vs-car-game-recap-vocals.mp3"
-      - type: "cut"
-        input: "/output/tor-vs-car-game-recap.mp3"
-        start: "00:06:38"
-        end: "00:06:45"
-        output: "tor-vs-car-game-recap-music-segment.mp3"
+        output: "Romanza Larghetto.mp3"
+      - type: "add_text"
+        name: "Title card"
+        input: "/output/fail.mp4"
+        text: "Hello"
+        # Bundled font (COPY src/ in the image); use DejaVu instead: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+        fontfile: "/app/src/assets/fonts/Michland Script.otf"
+        x: "(w-text_w)/2"
+        y: "80"
+        start: 1.0
+        end: 4.5
+        fontsize: 42
+        fontcolor: "yellow"
+        output: "fail-titled.mp4"

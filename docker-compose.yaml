@@ -1,8 +1,6 @@
 services:
   groove:
     build: .
-    environment:
-      - SUNO_API_KEY=${SUNO_API_KEY}
     volumes:
       - ./output:/output
       - ./config.yaml:/app/config.yaml:ro
