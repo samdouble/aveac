@@ -1,7 +1,7 @@
 [![CI](https://github.com/samdouble/groove-on-a-real-train/actions/workflows/checks.yml/badge.svg)](https://github.com/samdouble/groove-on-a-real-train/actions/workflows/checks.yml)
 [![Coverage Status](https://coveralls.io/repos/samdouble/groove-on-a-real-train/badge.svg?branch=master&service=github)](https://coveralls.io/github/samdouble/groove-on-a-real-train?branch=master)
 
-# Groove on a Real Train
+# AVEaC
 
 FFmpeg is a great tool for video and audio processing, but its command-line interface can be daunting if you're aiming to do non-tri
 
@@ -37,6 +37,17 @@ docker compose up --build
   fontsize: 42
   fontcolor: "yellow"
   output: "somevideo-titled.mp4"
+```
+
+##### Concatenate
+
+```yaml
+- type: "concatenate"
+  inputs:
+    - "/output/part1.mp4"
+    - "/output/part2.mp4"
+    - "/output/part3.mp4"
+  output: "merged.mp4"
 ```
 
 ##### Convert

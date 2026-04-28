@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from groove.operations.add_text import AddTextOperation
 from groove.operations.apply_filter import ApplyFilterOperation
+from groove.operations.concatenate import ConcatenateOperation
 from groove.operations.convert import ConvertOperation
 from groove.operations.cut import CutOperation
 from groove.operations.download import DownloadOperation
@@ -18,6 +19,7 @@ CONFIG_PATH = "/app/config.yaml"
 Operation = Annotated[
     AddTextOperation
     | ApplyFilterOperation
+    | ConcatenateOperation
     | ConvertOperation
     | CutOperation
     | DownloadOperation
