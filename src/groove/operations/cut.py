@@ -6,6 +6,9 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 from groove.ffmpeg_runtime import FFmpegInvocation
 
+_AUDIO_SUFFIXES = frozenset({".mp3", ".m4a", ".aac", ".wav", ".flac", ".ogg", ".opus"})
+_AUDIO_ENCODE_ARGS = ["-vn", "-ar", "48000", "-ac", "1", "-b:a", "192k"]
+
 
 def _parse_timestamp(value: str) -> float:
     parts = value.split(":")
@@ -21,8 +24,14 @@ def _parse_timestamp(value: str) -> float:
 class CutOperation(BaseModel):
     type: Literal["cut"]
     input: str
-    start: Annotated[str, Field(description="Start timestamp (HH:MM:SS, MM:SS, or seconds)")]
-    end: Annotated[str, Field(description="End timestamp (HH:MM:SS, MM:SS, or seconds)")]
+    start: Annotated[
+        str,
+        Field(description="Start timestamp (HH:MM:SS[.mmm], MM:SS[.mmm], or seconds)"),
+    ]
+    end: Annotated[
+        str,
+        Field(description="End timestamp (HH:MM:SS[.mmm], MM:SS[.mmm], or seconds)"),
+    ]
     name: str | None = None
     id: str = Field(default_factory=lambda: str(uuid4()))
     output: str | None = None
@@ -53,22 +62,26 @@ class CutOperation(BaseModel):
         end_s = _parse_timestamp(self.end)
         duration = end_s - start_s
 
-        output_path = output_dir / f"{input_path.stem}_cut{input_path.suffix}"
+        is_audio = input_path.suffix.lower() in _AUDIO_SUFFIXES
+        output_path = (
+            output_dir / f"{input_path.stem}_cut.mp3"
+            if is_audio
+            else output_dir / f"{input_path.stem}_cut{input_path.suffix}"
+        )
         label = self.name or input_path.name
         print(f"[{self.id}] Cutting: {label} [{self.start} → {self.end}]")
-        return FFmpegInvocation(
-            command=[
-                "ffmpeg",
-                "-y",
-                "-ss",
-                str(start_s),
-                "-t",
-                str(duration),
-                "-i",
-                str(input_path),
-                "-c",
-                "copy",
-                str(output_path),
-            ],
-            output_path=output_path,
-        )
+        command: list[str] = [
+            "ffmpeg",
+            "-y",
+            "-ss",
+            str(start_s),
+            "-t",
+            str(duration),
+            "-i",
+            str(input_path),
+        ]
+        if is_audio:
+            command.extend([*_AUDIO_ENCODE_ARGS, "-f", "mp3", str(output_path)])
+        else:
+            command.extend(["-c", "copy", str(output_path)])
+        return FFmpegInvocation(command=command, output_path=output_path)

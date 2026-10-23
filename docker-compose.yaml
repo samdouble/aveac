@@ -3,4 +3,5 @@ services:
     build: .
     volumes:
       - ./output:/output
-      - ./config.yaml:/app/config.yaml:ro
+      - ./${CONFIG_FILE:-config.yaml}:/app/config.yaml:ro
+      - ${MEDIA_DIR:-/tmp}:/media:ro

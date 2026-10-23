@@ -1,9 +1,9 @@
-[![CI](https://github.com/samdouble/groove-on-a-real-train/actions/workflows/checks.yml/badge.svg)](https://github.com/samdouble/groove-on-a-real-train/actions/workflows/checks.yml)
-[![Coverage Status](https://coveralls.io/repos/samdouble/groove-on-a-real-train/badge.svg?branch=master&service=github)](https://coveralls.io/github/samdouble/groove-on-a-real-train?branch=master)
-
 # AVEaC
 
 FFmpeg is a great tool for video and audio processing, but its command-line interface can be daunting if you're aiming to do non-tri
+
+[![CI](https://github.com/samdouble/groove-on-a-real-train/actions/workflows/checks.yml/badge.svg)](https://github.com/samdouble/groove-on-a-real-train/actions/workflows/checks.yml?branch=master)
+[![Coverage Status](https://coveralls.io/repos/samdouble/groove-on-a-real-train/badge.svg?branch=master&service=github)](https://coveralls.io/github/samdouble/groove-on-a-real-train?branch=master)
 
 [![Python](https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=fff)](https://www.python.org/)
 [![uv](https://img.shields.io/badge/uv-261230.svg?logo=uv&logoColor=#de5fe9)](https://docs.astral.sh/uv/)
@@ -15,6 +15,12 @@ From the root of the repository, run:
 
 ```sh
 docker compose up --build
+```
+
+To use host media files (for paths like `/media/...` in your config):
+
+```sh
+MEDIA_DIR=/Users/yourname/Pictures CONFIG_FILE=configyt.yaml docker compose up --build
 ```
 
 ### Configuration

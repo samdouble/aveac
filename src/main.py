@@ -1,4 +1,6 @@
+import os
 import shutil
+import sys
 from pathlib import Path
 from typing import Annotated
 from uuid import uuid4
@@ -16,7 +18,7 @@ from groove.operations.cut import CutOperation
 from groove.operations.download import DownloadOperation
 from groove.operations.extract_voice import ExtractVoiceOperation
 
-CONFIG_PATH = "/app/config.yaml"
+DEFAULT_CONFIG_PATH = "/app/config.yaml"
 
 Operation = Annotated[
     AddImageOperation
@@ -48,8 +50,16 @@ def load_config(path: str) -> Config:
     return Config.model_validate(raw)
 
 
+def get_config_path() -> str:
+    if len(sys.argv) > 1:
+        return sys.argv[1]
+    return os.environ.get("GROOVE_CONFIG_PATH", DEFAULT_CONFIG_PATH)
+
+
 def main() -> None:
-    config = load_config(CONFIG_PATH)
+    config_path = get_config_path()
+    print(f"Using config: {config_path}")
+    config = load_config(config_path)
     results_by_id: dict[str, Path] = {}
     for step in config.steps:
         if step.name:

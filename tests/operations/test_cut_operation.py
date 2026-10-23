@@ -19,6 +19,10 @@ class TestParseTimestamp:
     def test_fractional_seconds(self) -> None:
         assert _parse_timestamp("1:30.5") == 90.5
 
+    def test_hh_mm_ss_with_milliseconds(self) -> None:
+        assert _parse_timestamp("00:00:00.500") == 0.5
+        assert _parse_timestamp("00:00:02.250") == 2.25
+
 
 class TestCutOperationValidation:
     def test_valid_config(self) -> None:
@@ -85,6 +89,53 @@ class TestCutOperationRun:
             "copy",
             str(output_dir / "video_cut.mp4"),
         ]
+
+    def test_build_invocation_reencodes_audio_for_subsecond_precision(
+        self, tmp_path: Path
+    ) -> None:
+        input_file = tmp_path / "clip.mp3"
+        input_file.touch()
+        output_dir = tmp_path / "out"
+        output_dir.mkdir()
+
+        op = CutOperation(
+            type="cut", input=str(input_file), start="00:00:00", end="00:00:00.500"
+        )
+        invocation = op.build_invocation(output_dir=output_dir)
+
+        assert invocation.command == [
+            "ffmpeg",
+            "-y",
+            "-ss",
+            "0.0",
+            "-t",
+            "0.5",
+            "-i",
+            str(input_file),
+            "-vn",
+            "-ar",
+            "48000",
+            "-ac",
+            "1",
+            "-b:a",
+            "192k",
+            "-f",
+            "mp3",
+            str(output_dir / "clip_cut.mp3"),
+        ]
+
+    def test_build_invocation_outputs_mp3_for_m4a_input(self, tmp_path: Path) -> None:
+        input_file = tmp_path / "clip.m4a"
+        input_file.touch()
+        output_dir = tmp_path / "out"
+        output_dir.mkdir()
+
+        op = CutOperation(type="cut", input=str(input_file), start="0", end="1")
+        invocation = op.build_invocation(output_dir=output_dir)
+
+        assert invocation.output_path == output_dir / "clip_cut.mp3"
+        assert invocation.command[-1].endswith("clip_cut.mp3")
+        assert "-f" in invocation.command and "mp3" in invocation.command
 
     def test_output_filename_has_cut_suffix(self, tmp_path: Path) -> None:
         input_file = tmp_path / "my_song.mp3"
